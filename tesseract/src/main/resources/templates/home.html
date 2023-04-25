@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>タイトル</title>
+</head>
+<body>
+    <h2>Hello World!</h2>
+    画像アップロード<input id="upload-area" type="file" />
+    <button type="button" onclick="changeImageToBase64()">変換</button>
+    <p>Base64エンコード</p>
+    <textarea id="base64-encoded" style="width: 50%;" read-only=true></textarea>
+    <div id="upload-image-area" style="width: 20%;"></div>
+
+
+    <video id="camera" width="300" height="200"></video>
+
+
+    <script>
+        const inputFile = document.getElementById("upload-area");
+        function changeImageToBase64() {
+            const uploadImage = document.querySelector('#upload-area');
+            const file = uploadImage.files[0];
+
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                const base64Text = event.currentTarget.result;
+                document.querySelector('#base64-encoded').value = base64Text;
+                document.querySelector('#upload-image-area').innerHTML = `<img src="${base64Text}" width="100%" />`;
+            }
+            reader.readAsDataURL(file);
+        }
+
+
+        const video  = document.querySelector("#camera");
+        navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+            width: 300,
+            height: 200,
+            facingMode: "user"   // フロントカメラを利用する
+            // facingMode: { exact: "environment" }  // リアカメラを利用する場合
+            }
+        })
+        .then( (stream) => {
+            video.srcObject = stream;
+            video.onloadedmetadata = (e) => {
+                video.play();
+            };
+        })
+        .catch( (err) => {
+            console.log(err.name + ": " + err.message);
+        });
+
+    </script>
+</body>
+</html>

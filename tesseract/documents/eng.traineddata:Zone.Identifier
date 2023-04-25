@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://github.com/tesseract-ocr/tessdata/blob/main/eng.traineddata
+HostUrl=https://raw.githubusercontent.com/tesseract-ocr/tessdata/main/eng.traineddata

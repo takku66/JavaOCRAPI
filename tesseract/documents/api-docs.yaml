@@ -1,0 +1,530 @@
+openapi: 3.0.1
+info:
+  description: "画像をOCR処理して文字列を返します。"
+  title: Java OCR API
+  version: v1
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+# OCR処理の依頼
+  /image:
+    post:
+      tags:
+      - image-controller
+      operationId: create
+      summary: "送信した画像のOCR処理"
+      description: |
+        送信された画像をOCR処理し、処理結果を返します。
+      requestBody:
+        description: "処理に必要なパラメータ"
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      responses:
+        "200":
+          description: "ユーザーの新規登録に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "新規登録成功時のレスポンス"
+                  value:
+                    id: 1676799178116000000
+                    messages: ["ユーザーが登録されました。"]
+                    data: 
+                      id: 1676799178116000000
+                      email: sample.test_123@test.com
+        "400":
+          description: "ユーザーの新規登録に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "既に同じメールアドレスが登録されていた場合"
+                  value: 
+                    errors: [{"code": "DUPLICATE_EMAIL", 
+                            "message": "既に同じメールアドレスが登録されています。email=sample.test_123@test.com", 
+                            "displayMessage":"既に同じメールアドレスが使用されています。"}]
+                response2:
+                  summary: "入力された値のバリデーションによるエラーの場合"
+                  value: 
+                    errors: [{"code": "CREATE_FAILED_USER",
+                            "message": "登録に失敗しました。", 
+                            "displayMessage":"登録に失敗しました。"},
+                            {"code": "Pattern",
+                            "message": "メールアドレスが正しくありません。, field name=email, rejected value=dev....", 
+                            "displayMessage":"メールアドレスが正しくありません。"}]
+                response3:
+                  summary: "他の原因によりユーザーの登録ができなかった場合"
+                  value: 
+                    errors: [{"code": "CREATE_FAILED_USER",
+                            "message": "登録に失敗しました。", 
+                            "displayMessage":"登録に失敗しました。"}]
+# Todo
+  /todos:
+    get:
+      tags:
+      - todo-controller
+      operationId: list
+      summary: "ユーザーが持つ全てのTodoの取得"
+      description: "指定されたユーザーIDのユーザーが持つ全てのTodoを返します。"
+      parameters:
+      - name: userId
+        description: "取得したいTodoを持っているユーザーIDを指定します。"
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: "Todoの取得に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したユーザーのTodoが全て取得できた場合"
+                  value:
+                    totalResultCount: 2
+                    messages: ["TODOが2件ヒットしました。"]
+                    data: [{"id": "1676799208116000000",
+                          "userId": "1676799178116000000", 
+                          "title": "Todoサンプル タイトル", 
+                          "content": "Todoサンプル 内容", 
+                          "isComplete": false, 
+                          "limitDate": "2023-01-01T00:00:00.000", 
+                          "createdAt": "2023-01-01T00:00:00.000", 
+                          "updatedAt": "2023-01-01T00:00:00.000"},
+                          {"id": "1676799220116000000",
+                          "userId": "1676799178116000000", 
+                          "title": "Todoサンプル タイトル２", 
+                          "content": "Todoサンプル 内容２", 
+                          "isComplete": false, 
+                          "limitDate": "2023-01-01T00:00:00.000", 
+                          "createdAt": "2023-01-01T00:00:00.000", 
+                          "updatedAt": "2023-01-01T00:00:00.000"}]
+
+        "400":
+          description: "Todoの取得に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "ユーザーIDが指定されていない場合"
+                  value: 
+                    errors: [{"code": "NOT_ASSIGNMENT_USER_ID", 
+                            "message": "ユーザーIDを指定してください。", 
+                            "displayMessage":"ユーザーIDを指定してください。"}]
+    post:
+      tags:
+      - todo-controller
+      operationId: create_1
+      summary: "Todoの登録"
+      description: "指定されたユーザーに対してTodoを登録します。"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoRequest'
+        required: true
+      responses:
+        "200":
+          description: "Todoの作成に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したユーザーに対してTodoを作成できた場合"
+                  value:
+                    id: "1676799208116000000"
+                    messages: ["TODOを作成しました。"]
+
+        "400":
+          description: "Todoの作成に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定されたユーザーが存在しなかった場合"
+                  value: 
+                    errors: [{"code": "CREATE_FAILED_TODO",
+                            "message": "TODOを作成できませんでした。", 
+                            "displayMessage":"TODOを作成できませんでした。"},
+                            {"code": "NOT_EXISTS_USER", 
+                            "message": "ユーザーが存在しません。", 
+                            "displayMessage":"ユーザーが存在しません。"}]
+                response2:
+                  summary: "入力された値のバリデーションによるエラーの場合"
+                  value: 
+                    errors: [{"code": "CREATE_FAILED_TODO",
+                            "message": "TODOを作成できませんでした。", 
+                            "displayMessage":"TODOを作成できませんでした。"},
+                            {"code": "NotBlank",
+                            "message": "タイトルは必須です。, field name=title, rejected value=", 
+                            "displayMessage":"タイトルは必須です。"}]
+                response3:
+                  summary: "他の原因によりユーザーの登録ができなかった場合"
+                  value: 
+                    errors: [{"code": "CREATE_FAILED_TODO",
+                            "message": "TODOを作成できませんでした。", 
+                            "displayMessage":"TODOを作成できませんでした。"}]
+  /todos/{id}:
+    get:
+      tags:
+      - todo-controller
+      operationId: get_1
+      summary: "Todoの取得"
+      description: "指定されたIDのTodo情報を取得します。"
+      parameters:
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: "Todoの取得に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したユーザーIDとTodoIDで情報を取得できた場合"
+                  value:
+                    totalResultCount: 1
+                    messages: ["TODOが1件ヒットしました。"]
+                    data: [{"id": "1676799208116000000",
+                          "userId": "1676799178116000000", 
+                          "title": "Todoサンプル タイトル", 
+                          "content": "Todoサンプル 内容", 
+                          "isComplete": false, 
+                          "limitDate": "2023-01-01T00:00:00.000", 
+                          "createdAt": "2023-01-01T00:00:00.000", 
+                          "updatedAt": "2023-01-01T00:00:00.000"}]
+        "400":
+          description: "Todoの取得に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したユーザーIDとTodoIDで情報が取得できなかった場合"
+                  value: 
+                    errors: [{"code": "NOT_FOUND_TODO",
+                            "message": "Todoが見つかりませんでした。", 
+                            "displayMessage":"Todoが見つかりませんでした。"}]
+    delete:
+      tags:
+      - todo-controller
+      operationId: delete
+      summary: "Todoの削除"
+      description: "指定されたIDのTodo情報を削除します。"
+      parameters:
+      - name: userId
+        description: "削除したいTodo情報を持つユーザーIDを指定します。"
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: id
+        description: "削除したいTodoのIDを指定します。"
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: "Todoの削除に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したTodoの削除に成功した場合"
+                  value:
+                    messages: ["TODOを削除しました。"]
+        "400":
+          description: "Todoの削除に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したTodoの削除に失敗した場合"
+                  value: 
+                    errors: [{"code": "DELETE_FAILED_TODO",
+                            "message": "TODOを削除できませんでした。", 
+                            "displayMessage":"TODOを削除できませんでした。"}]
+    patch:
+      tags:
+      - todo-controller
+      operationId: update
+      summary: "Todoの更新"
+      description: "指定されたIDのTodo情報を更新します。"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoRequest'
+        required: true
+      responses:
+        "200":
+          description: "Todoの更新に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したTodoの更新に成功した場合"
+                  value:
+                    messages: ["TODOを更新しました。"]
+        "400":
+          description: "Todoの更新に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定されたユーザーが存在しなかった場合"
+                  value: 
+                    errors: [{"code": "UPDATE_FAILED_TODO",
+                            "message": "TODOを更新できませんでした。", 
+                            "displayMessage":"TODOを更新できませんでした。"},
+                            {"code": "NOT_EXISTS_USER",
+                            "message": "ユーザーが存在しません。", 
+                            "displayMessage":"ユーザーが存在しません。"},
+                            ]
+                response2:
+                  summary: "入力された値のバリデーションによるエラーの場合"
+                  value: 
+                    errors: [{"code": "UPDATE_FAILED_TODO",
+                            "message": "TODOを更新できませんでした。", 
+                            "displayMessage":"TODOを更新できませんでした。"},
+                            {"code": "NotBlank",
+                            "message": "タイトルは必須です。, field name=title, rejected value=", 
+                            "displayMessage":"タイトルは必須です。"}]
+                response3:
+                  summary: "他の原因によりユーザーの登録ができなかった場合"
+                  value: 
+                    errors: [{"code": "UPDATE_FAILED_TODO",
+                            "message": "TODOを更新できませんでした。", 
+                            "displayMessage":"TODOを更新できませんでした。"}]
+
+  /todos/search:
+    get:
+      tags:
+      - todo-controller
+      operationId: list_1
+      summary: "Todoの検索"
+      description: |
+        指定されたキーワードでTodo情報を検索します。  
+        タイトルと内容について、キーワードで検索が可能です。
+      parameters:
+      - name: userId
+        description: "検索したいTodo情報をもつユーザーIDを指定します。"
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: keyword
+        description: "検索したい文字列を指定します。"
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Todoの取得に成功した場合"
+          content:
+            'application/json':
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "指定したキーワードにヒットするTodoが存在した場合"
+                  value:
+                    totalResultCount: 2
+                    messages: ["TODOが2件ヒットしました。"]
+                    data: [{"id": "1676799208116000000",
+                          "userId": "1676799178116000000", 
+                          "title": "Todoサンプル タイトル", 
+                          "content": "Todoサンプル 内容", 
+                          "isComplete": false, 
+                          "limitDate": "2023-01-01T00:00:00.000", 
+                          "createdAt": "2023-01-01T00:00:00.000", 
+                          "updatedAt": "2023-01-01T00:00:00.000"},
+                          {"id": "1676799220116000000",
+                          "userId": "1676799178116000000", 
+                          "title": "Todoサンプル タイトル２", 
+                          "content": "Todoサンプル 内容２", 
+                          "isComplete": false, 
+                          "limitDate": "2023-01-01T00:00:00.000", 
+                          "createdAt": "2023-01-01T00:00:00.000", 
+                          "updatedAt": "2023-01-01T00:00:00.000"}]
+
+        "400":
+          description: "Todoの取得に失敗した場合"
+          content:
+            'application/json':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BaseResponse'
+              examples:
+                response1:
+                  summary: "ユーザーIDが指定されていない場合"
+                  value: 
+                    errors: [{"code": "NOT_ASSIGNMENT_USER_ID", 
+                            "message": "ユーザーIDを指定してください。", 
+                            "displayMessage":"ユーザーIDを指定してください。"}]
+
+
+components:
+  schemas:
+    Message:
+      description: "各メッセージオブジェクトの情報を保持しています。"
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        displayMessage:
+          type: string
+    BaseResponse:
+      description: "共通のレスポンスオブジェクトです。プロパティがnullの場合は、レスポンスの値に含まれません。"
+      properties:
+        id:
+          type: object
+        totalResultCount:
+          type: integer
+          format: int32
+        errors:
+          type: object
+          format: List<Map<String, String>>
+        messages:
+          type: array
+        data: 
+          type: object
+    UserResponse:
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1676799178116000000
+        email:
+          type: string
+          example: test.aaa_bbb-ccc@abc.com
+    TodoResponse:
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1676799178116000000
+        userId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        isComplete:
+          type: boolean
+        limitDate:
+          type: string
+          format: yyyy-MM-ddTHH:mm:ss
+        createdAt:
+          type: string
+          format: yyyy-MM-ddTHH:mm:ss
+        updatedAt:
+          type: string
+          format: yyyy-MM-ddTHH:mm:ss
+    ImageRequest:
+      required:
+      - file
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          maxLength: 255
+          minLength: 0
+          pattern: "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+          type: string
+          example: test.aaa_bbb-ccc@abc.com
+    TodoRequest:
+      required:
+      - title
+      - userId
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        title:
+          maxLength: 500
+          minLength: 0
+          type: string
+        content:
+          maxLength: 2000
+          minLength: 0
+          type: string
+        limitDate:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        complete:
+          type: boolean
+
+    
+
+
