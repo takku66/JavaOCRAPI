@@ -35,7 +35,7 @@ public class ImageController {
         // Base64からのデコード
         byte[] bytes = Base64.getDecoder().decode(file.split(",")[1]);
 
-        Path imagePath = Paths.get("./src/main/resources/static/image.png");
+        Path imagePath = Paths.get("./src/main/resources/static/image.JPG");
         System.out.println(Files.exists(imagePath));
         File imageFile = imagePath.toFile();
         if( !Files.exists(imagePath)){
